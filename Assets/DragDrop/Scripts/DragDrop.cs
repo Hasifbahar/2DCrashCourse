@@ -36,7 +36,7 @@ public class DragDrop : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, I
 
         // Move to top (root canvas)
         transform.SetParent(canvas.transform);
-        transform.SetAsLastSibling();
+       // transform.SetAsLastSibling();
     }
 
     public void OnEndDrag(PointerEventData eventData)

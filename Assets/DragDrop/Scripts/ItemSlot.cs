@@ -21,4 +21,12 @@ public class ItemSlot : MonoBehaviour, IDropHandler {
         }
     }
 
+    public void ClearSlot()
+    {
+        // Remove all children (items) from the slot
+        foreach (Transform child in transform)
+        {
+            Destroy(child.gameObject);
+        }
+    }
 }
