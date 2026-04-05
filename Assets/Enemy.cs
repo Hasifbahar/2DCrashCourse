@@ -5,12 +5,15 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     Animator animator;
-
+    GameUI gameUI;
     public float Health {
         set {
             health = value;
             if(health <= 0) {
                 Defeated();
+                gameUI.score += 1;
+                gameUI.UpdateScore();
+                gameUI.ShowTutorial();
             }
         }
         get {
@@ -22,6 +25,7 @@ public class Enemy : MonoBehaviour
 
     public void Start() {
         animator = GetComponent<Animator>();
+        gameUI = FindObjectOfType<GameUI>();
     }
 
     public void Defeated(){
