@@ -5,7 +5,7 @@ public class DragDrop : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, I
 {
 
     [SerializeField] private Canvas canvas;
-
+    [SerializeField] private bool isTemplate = false;
     private RectTransform rectTransform;
     private CanvasGroup canvasGroup;
     private Transform originalParent;
@@ -29,14 +29,26 @@ public class DragDrop : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, I
     {
         Debug.Log("OnBeginDrag");
 
+        if (isTemplate)
+        {
+            // Create clone to drag
+            GameObject clone = Instantiate(gameObject, transform.parent);
+            clone.GetComponent<DragDrop>().isTemplate = false;
+
+            // Forward drag to clone
+            eventData.pointerDrag = clone;
+            ExecuteEvents.Execute(clone, eventData, ExecuteEvents.beginDragHandler);
+
+            return;
+        }
+
         originalParent = transform.parent;
 
         canvasGroup.alpha = .6f;
         canvasGroup.blocksRaycasts = false;
 
-        // Move to top (root canvas)
         transform.SetParent(canvas.transform);
-       // transform.SetAsLastSibling();
+        transform.SetAsLastSibling();
     }
 
     public void OnEndDrag(PointerEventData eventData)
@@ -46,11 +58,10 @@ public class DragDrop : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, I
         canvasGroup.alpha = 1f;
         canvasGroup.blocksRaycasts = true;
 
-        // If not dropped into a slot, return
+        // Not dropped into a slot > delete
         if (transform.parent == canvas.transform)
         {
-            transform.SetParent(originalParent);
-            rectTransform.anchoredPosition = Vector2.zero;
+            Destroy(gameObject);
         }
     }
 }
