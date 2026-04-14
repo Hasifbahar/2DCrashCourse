@@ -16,9 +16,8 @@ public class ItemSlot : MonoBehaviour, IDropHandler
             ClearSlot();
 
             RectTransform dragged = eventData.pointerDrag.GetComponent<RectTransform>();
-            dragged.SetParent(transform);
-            dragged.anchoredPosition = Vector2.zero;
-
+            dragged.SetParent(transform, false);
+            dragged.localPosition = Vector3.zero;
             currentItem = dragged.GetComponent<DraggableItemData>();
         }
     }
