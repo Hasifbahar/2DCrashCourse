@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using MaskTransitions;
 
 public class PuzzleManager : MonoBehaviour
 {
@@ -50,7 +51,7 @@ public class PuzzleManager : MonoBehaviour
                 ResetAll();
 
                 workerAnimator.SetBool("dead", true);
-                yield return new WaitForSeconds(3f);
+                yield return new WaitForSeconds(2f);
 
                 tryUI.SetActive(true);
 
@@ -71,6 +72,8 @@ public class PuzzleManager : MonoBehaviour
 
         ResetAll();
         SetIdle(true);
+        yield return new WaitForSeconds(2f);
+        TransitionManager.Instance.LoadLevel("LevelScene", 0.5f);
     }
 
     void PlayCorrectAnimation(int index)
