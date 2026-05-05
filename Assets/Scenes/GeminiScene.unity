@@ -950,7 +950,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 5, y: -0.0005493164}
+  m_AnchoredPosition: {x: 5, y: -0.00048828125}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1216428645
@@ -1295,7 +1295,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bdd8a8aec6847224ca55524d8d113032, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  apiKey: AIzaSyATgzGMnuNphw9MIPLfv2CWdiMfO6lro20
+  apiKey: 
   inputField: {fileID: 216014989}
   chatDisplay: {fileID: 1216428645}
   scrollRect: {fileID: 356682880}
@@ -1737,7 +1737,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1289190378}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.99999696
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
