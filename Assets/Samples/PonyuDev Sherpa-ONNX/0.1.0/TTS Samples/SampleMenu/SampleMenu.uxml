@@ -1,0 +1,26 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Samples/PonyuDev%20Sherpa-ONNX/0.1.0/TTS%20Samples/Shared/Shared.uss?fileID=7433441132597879392&amp;guid=001e0f0752ba4498a8526c989a850ba3&amp;type=3#Shared" />
+    <Style src="project://database/Assets/Samples/PonyuDev%20Sherpa-ONNX/0.1.0/TTS%20Samples/SampleMenu/SampleMenu.uss?fileID=7433441132597879392&amp;guid=bc9f246c9141647179757c177c7e6680&amp;type=3#SampleMenu" />
+    <ui:VisualElement class="sample-root">
+        <ui:Label text="Sherpa-ONNX Samples" class="sample-title" />
+        <ui:Button text="TTSScene (Alt+ W to Back)" parse-escape-sequences="true" display-tooltip-when-elided="true" name="btnGemini" style="width: 491px; font-size: 36px;" />
+        <ui:Label text="Choose an example to run:" enable-rich-text="true" class="sample-info" style="margin-bottom: 32px;" />
+        <ui:Button name="btnSimple" class="menu-card">
+            <ui:Label text="Simple TTS" class="menu-card-title" />
+            <ui:Label text="Basic GenerateAsync — enter text, pick speed and speaker, play result." class="menu-card-desc" />
+        </ui:Button>
+        <ui:Button name="btnProgress" class="menu-card">
+            <ui:Label text="TTS with Progress" class="menu-card-title" />
+            <ui:Label text="GenerateWithCallbackProgress — real-time progress bar and chunk counter." class="menu-card-desc" />
+        </ui:Button>
+        <ui:Button name="btnConfig" class="menu-card">
+            <ui:Label text="TTS with Config" class="menu-card-title" />
+            <ui:Label text="GenerateWithConfig — advanced: silence scale, num steps, extra params." class="menu-card-desc" />
+        </ui:Button>
+        <ui:Button name="btnCache" class="menu-card">
+            <ui:Label text="Cache Control" class="menu-card-title" />
+            <ui:Label text="Toggle result/clip/source caches at runtime, generate and observe stats live." class="menu-card-desc" />
+        </ui:Button>
+        <ui:Label name="infoLabel" class="sample-info" style="margin-top: 24px;" />
+    </ui:VisualElement>
+</ui:UXML>
