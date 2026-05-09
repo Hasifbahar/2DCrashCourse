@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 [System.Serializable] public class GeminiPart { public string text; }
@@ -53,7 +54,7 @@ public class GeminiChatbot : MonoBehaviour
     [Header("Settings")]
     [TextArea(3, 5)]
     public string systemPrompt = "You are a helpful assistant in a Unity game. Be concise.";
-
+    public string startSpeech = "Hello! I'm Gemini, your in-game assistant. How can I help you today?";
     public float typeSpeed = 0.02f;
     public int maxHistory = 3;
 
@@ -70,7 +71,7 @@ public class GeminiChatbot : MonoBehaviour
     void Start()
     {
         _ttsManager = GetComponent<SherpaTTSManager>(); // Cache it here
-        _ttsManager.SpeakAsync("Hi my name is Gemini! ").Forget();
+        _ttsManager.SpeakAsync(startSpeech).Forget();
         sendButton.onClick.AddListener(OnSendClick);
         chatDisplay.text = "<color=#013220><i>System: Connection ready.</i></color>\n";
         StartCoroutine(ForceScroll());

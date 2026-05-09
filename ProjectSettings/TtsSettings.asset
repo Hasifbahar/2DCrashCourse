@@ -30,7 +30,7 @@ MonoBehaviour:
       modelSource: 0
       numThreads: 1
       provider: cpu
-      speakerId: 7
+      speakerId: 2
       speed: 1
       ruleFsts: 
       ruleFars: 
