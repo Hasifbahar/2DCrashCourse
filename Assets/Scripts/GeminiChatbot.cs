@@ -42,9 +42,16 @@ public class GeminiChatbot : MonoBehaviour
 {
     [Header("API Config")]
     [SerializeField] private string apiKey = "YOUR_API_KEY_HERE";
-    private const string endpoint =
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent";
 
+    [Tooltip("Select the model version to use for requests")]
+    [SerializeField] private GeminiModel selectedModel = GeminiModel.Gemini_3_1_Flash_Lite;
+    public enum GeminiModel
+    {
+        Gemini_3_1_Flash_Lite,
+        Gemini_3_Flash,
+        Gemini_2_5_Flash,
+        Gemini_2_5_Flash_Lite
+    }
     [Header("UI")]
     public TMP_InputField inputField;
     public TMP_Text chatDisplay;
@@ -54,6 +61,7 @@ public class GeminiChatbot : MonoBehaviour
     [Header("Settings")]
     [TextArea(3, 5)]
     public string systemPrompt = "You are a helpful assistant in a Unity game. Be concise.";
+    [TextArea(3, 5)]
     public string startSpeech = "Hello! I'm Gemini, your in-game assistant. How can I help you today?";
     public float typeSpeed = 0.02f;
     public int maxHistory = 3;
@@ -76,7 +84,22 @@ public class GeminiChatbot : MonoBehaviour
         chatDisplay.text = "<color=#013220><i>System: Connection ready.</i></color>\n";
         StartCoroutine(ForceScroll());
     }
+    private string GetModelIdentifier()
+    {
+        return selectedModel switch
+        {
+            GeminiModel.Gemini_3_1_Flash_Lite => "gemini-3.1-flash-lite-preview",
+            GeminiModel.Gemini_3_Flash => "gemini-3-flash",
+            GeminiModel.Gemini_2_5_Flash => "gemini-2.5-flash",
+            GeminiModel.Gemini_2_5_Flash_Lite => "gemini-2.5-flash-lite",
+            _ => "gemini-3.1-flash-lite-preview"
+        };
+    }
 
+    private string GetEndpoint()
+    {
+        return $"https://generativelanguage.googleapis.com/v1beta/models/{GetModelIdentifier()}:generateContent?key={apiKey}";
+    }
     void Update()
     {
         // Enter = Send | Shift+Enter = New line
@@ -119,7 +142,7 @@ public class GeminiChatbot : MonoBehaviour
         };
 
         string json = JsonUtility.ToJson(requestData);
-        string url = $"{endpoint}?key={apiKey}";
+        string url = GetEndpoint();
 
         using (UnityWebRequest req = new UnityWebRequest(url, "POST"))
         {
