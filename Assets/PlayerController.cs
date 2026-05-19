@@ -13,6 +13,8 @@ public class PlayerController : MonoBehaviour
 
     public SwordAttack swordAttack;
 
+    public bool interact;
+
     Vector2 movementInput;
 
     SpriteRenderer spriteRenderer;
@@ -94,7 +96,10 @@ public class PlayerController : MonoBehaviour
     void OnFire() {
         animator.SetTrigger("swordAttack");
     }
-
+    void OnInteract()
+    {
+        interact = true;
+    }
     public void SwordAttack() {
         LockMovement();
 

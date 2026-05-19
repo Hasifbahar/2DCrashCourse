@@ -82,10 +82,10 @@ public class GeminiChatbot : MonoBehaviour
     void Start()
     {
         _ttsManager = GetComponent<SherpaTTSManager>(); // Cache it here
-        _ttsManager.SpeakAsync(startSpeech).Forget();
         sendButton.onClick.AddListener(OnSendClick);
         chatDisplay.text = "<color=#013220><i>System: Connection ready.</i></color>\n";
         StartCoroutine(ForceScroll());
+        StartCoroutine(Typewriter(startSpeech));
     }
     private string GetModelIdentifier()
     {
