@@ -1298,7 +1298,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bdd8a8aec6847224ca55524d8d113032, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  apiKey: 
+  apiKey: AIzaSyAHM5hHfetEn1Y8_gftqWHxuff7EZkbVCo
   selectedModel: 0
   inputField: {fileID: 216014989}
   chatDisplay: {fileID: 1216428645}
