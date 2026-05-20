@@ -66,6 +66,9 @@ public class GeminiChatbot : MonoBehaviour
     public float typeSpeed = 0.02f;
     public int maxHistory = 3;
 
+    [Header("Animation")]
+    [SerializeField] private Animator npcAnimator;
+
     private List<GeminiContent> chatHistory = new List<GeminiContent>();
     private Coroutine chatRoutine;
     private SherpaTTSManager _ttsManager;
@@ -79,10 +82,10 @@ public class GeminiChatbot : MonoBehaviour
     void Start()
     {
         _ttsManager = GetComponent<SherpaTTSManager>(); // Cache it here
-        _ttsManager.SpeakAsync(startSpeech).Forget();
         sendButton.onClick.AddListener(OnSendClick);
         chatDisplay.text = "<color=#013220><i>System: Connection ready.</i></color>\n";
         StartCoroutine(ForceScroll());
+        StartCoroutine(Typewriter(startSpeech));
     }
     private string GetModelIdentifier()
     {
@@ -245,13 +248,12 @@ public class GeminiChatbot : MonoBehaviour
             {
                 result = await _ttsManager.SpeakAsync(cleanText);
             });
-
             if (result != null && result.DurationSeconds > 0f)
             {
                 dynamicTypeSpeed = result.DurationSeconds / Mathf.Max(text.Length, 1);
             }
         }
-
+        npcAnimator.SetBool("isTalking", true);
         // Type with synced speed
         for (int i = 0; i < text.Length; i++)
         {
@@ -259,6 +261,7 @@ public class GeminiChatbot : MonoBehaviour
             ScrollToBottom();
             yield return new WaitForSeconds(dynamicTypeSpeed);
         }
+        npcAnimator.SetBool("isTalking", false);
     }
 
     private void AppendMessage(string sender, string msg, Color color)

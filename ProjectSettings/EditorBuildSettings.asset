@@ -23,6 +23,15 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Puzzle 1.unity
     guid: 3a148523dc3f62c4c912ca62bb99ea02
+  - enabled: 1
+    path: Assets/Scenes/Puzzle 2.unity
+    guid: 926672b3bfda5a948a5088d113bbe7fe
+  - enabled: 1
+    path: Assets/Scenes/Puzzle 3.unity
+    guid: 79c27edde7bacb34e80e396bfbf65640
+  - enabled: 1
+    path: Assets/Scenes/GeminiScene.unity
+    guid: 618b782fe4ce974429551934a9451f9c
   - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
