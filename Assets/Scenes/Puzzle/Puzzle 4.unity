@@ -631,6 +631,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   correctType: string
+  isCorrectAnswer: 0
 --- !u!1 &246271014
 GameObject:
   m_ObjectHideFlags: 0
@@ -2475,6 +2476,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   correctType: double
+  isCorrectAnswer: 0
 --- !u!114 &1233396664
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4044,6 +4046,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   correctType: int
+  isCorrectAnswer: 0
 --- !u!114 &1975087517
 MonoBehaviour:
   m_ObjectHideFlags: 0

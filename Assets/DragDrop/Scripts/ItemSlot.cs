@@ -1,21 +1,27 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class ItemSlot : MonoBehaviour, IDropHandler
 {
     public string correctType; // expected answer
-    [SerializeField] private bool isCorrectAnswer; // whether the slot has the correct item
+    [SerializeField] private bool isCorrectAnswer; // shows in editor whether the slot has the correct item
     private DraggableItemData currentItem;
 
     private void Start()
     {
         currentItem = GetComponentInChildren<DraggableItemData>();
+        CheckAnswer();
+    }
+
+    void CheckAnswer()
+    {
         if (currentItem != null)
         {
             isCorrectAnswer = currentItem.typeName == correctType;
+        }
+        else
+        {
+            isCorrectAnswer = false;
         }
     }
     public void OnDrop(PointerEventData eventData)
@@ -28,25 +34,26 @@ public class ItemSlot : MonoBehaviour, IDropHandler
             dragged.SetParent(transform, false);
             dragged.localPosition = Vector3.zero;
             currentItem = dragged.GetComponent<DraggableItemData>();
-            if (currentItem != null)
-            {
-                isCorrectAnswer = currentItem.typeName == correctType;
-            }
         }
+        CheckAnswer();
     }
 
     public bool IsCorrect()
     {
+        CheckAnswer();
         if (currentItem == null) return false;
         return currentItem.typeName == correctType;
+
     }
 
     public void ClearSlot()
     {
+
         foreach (Transform child in transform)
         {
             Destroy(child.gameObject);
         }
         currentItem = null;
+        CheckAnswer();
     }
 }
