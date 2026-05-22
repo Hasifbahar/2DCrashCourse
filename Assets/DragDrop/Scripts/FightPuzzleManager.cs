@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using MaskTransitions;
 
-public class PuzzleManager : MonoBehaviour
+public class FightPuzzleManager : MonoBehaviour
 {
     public ItemSlot[] slots;
 
