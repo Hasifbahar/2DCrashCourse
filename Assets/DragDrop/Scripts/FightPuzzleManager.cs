@@ -21,7 +21,7 @@ public class FightPuzzleManager : MonoBehaviour
     {
         StartCoroutine(CheckAndPlay());
     }
-    IEnumerator CheckAndPlay()
+IEnumerator CheckAndPlay()
     {
         winUI.SetActive(false);
         tryUI.SetActive(false);
@@ -53,11 +53,17 @@ public class FightPuzzleManager : MonoBehaviour
                 workerAnimator.SetBool("dead", true);
                 yield return new WaitForSeconds(2f);
 
+                // Show the UI
                 tryUI.SetActive(true);
+
+                // ADDED: Wait for a moment so the player sees the UI, 
+                // then transition to the alternate level
+                yield return new WaitForSeconds(2f); 
+                TransitionManager.Instance.LoadLevel("AlternateLevel1", 0.5f);
 
                 ResetAll();
                 SetIdle(true);
-                yield break;
+                yield break; // Exit the coroutine
             }
         }
 

@@ -7,6 +7,10 @@ public class Enemy : MonoBehaviour
     Animator animator;
     GameUI gameUI;
     
+    [Header("Tutorial Settings")]
+    [TextArea(3, 10)] 
+    public string myClueText = "Write this slime's specific clue here!";
+    
     public float Health {
         set {
             health = value;
@@ -17,7 +21,8 @@ public class Enemy : MonoBehaviour
                 if (gameUI != null) {
                     gameUI.score += 1;
                     gameUI.UpdateScore();
-                    gameUI.ShowTutorial();
+                    // Pass THIS enemy's specific text to the new ShowTutorial method
+                    gameUI.ShowTutorial(myClueText);
                 }
             }
             else {

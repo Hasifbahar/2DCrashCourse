@@ -45,3 +45,6 @@ TagManager:
   - name: Decor
     uniqueID: 3646497167
     locked: 0
+  - name: front
+    uniqueID: 4210746091
+    locked: 0

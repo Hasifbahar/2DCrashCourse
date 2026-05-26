@@ -16,8 +16,9 @@ MonoBehaviour:
   npcPortrait: {fileID: 21300000, guid: 5c14251ba2015bb4194e2bdc073fbacc, type: 3}
   dialogueLines:
   - Hello there player!
-  - You have to defeat the slimes to obtain the clues!
-  autoProgressLines: 0100
+  - This level you will be learning about decisions!
+  - You have to defeat the robots to obtain the clues!
+  autoProgressLines: 010100
   autoProgressDelay: 1.5
   typingSpeed: 0.05
   voiceSound: {fileID: 0}
