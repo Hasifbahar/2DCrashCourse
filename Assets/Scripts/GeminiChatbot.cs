@@ -1,4 +1,3 @@
-
 using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
@@ -33,14 +32,26 @@ public class ElevenLabsRequest
 [RequireComponent(typeof(AudioSource))]
 public class GeminiChatbot : MonoBehaviour
 {
+    [Header("Config Settings")]
+    [Tooltip("Drag and drop your secrets.json file here.")]
+    [SerializeField] private TextAsset apiConfigFile;
+    
+    // Data class used to deserialize the JSON
+    [System.Serializable]
+    private class ApiSecrets
+    {
+        public string geminiApiKey;
+        public string elevenLabsApiKey;
+    }
+
     [Header("API Config (Gemini)")]
-    [SerializeField] private string apiKey = "YOUR_GEMINI_API_KEY";
+    private string geminiApiKey;
     [SerializeField] private GeminiModel selectedModel = GeminiModel.Gemini_3_1_Flash_Lite;
 
     public enum GeminiModel { Gemini_3_1_Flash_Lite, Gemini_3_Flash, Gemini_2_5_Flash, Gemini_2_5_Flash_Lite }
 
     [Header("API Config (ElevenLabs)")]
-    [SerializeField] private string elevenLabsApiKey = "YOUR_ELEVENLABS_API_KEY";
+    private string elevenLabsApiKey;
     [Tooltip("The ID of the voice you want to use (e.g., pMsXg91Y998u4A3m9P6C)")]
     [SerializeField] private string voiceId = "21m00Tcm4TNLbtqAWWHP"; // Default Rachel Voice
 
@@ -67,6 +78,11 @@ public class GeminiChatbot : MonoBehaviour
     private int thinkingStartIndex = -1;
     private float thinkingTimer = 0f;
 
+    void Awake()
+    {
+        LoadApiKeys();
+    }
+
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
@@ -85,10 +101,31 @@ public class GeminiChatbot : MonoBehaviour
         _ => "gemini-3.1-flash-lite-preview"
     };
 
-    private string GetGeminiEndpoint() => $"https://generativelanguage.googleapis.com/v1beta/models/{GetModelIdentifier()}:generateContent?key={apiKey}";
+    private string GetGeminiEndpoint() => $"https://generativelanguage.googleapis.com/v1beta/models/{GetModelIdentifier()}:generateContent?key={geminiApiKey}";
     private string GetElevenLabsEndpoint() => $"https://api.elevenlabs.io/v1/text-to-speech/{voiceId}";
 
+    private void LoadApiKeys()
+    {
+        if (apiConfigFile != null)
+        {
+            string jsonContent = apiConfigFile.text;
+            
+            // Parse the JSON into our C# object
+            ApiSecrets secrets = JsonUtility.FromJson<ApiSecrets>(jsonContent);
 
+            if (secrets != null)
+            {
+                geminiApiKey = secrets.geminiApiKey;
+                elevenLabsApiKey = secrets.elevenLabsApiKey;
+                
+                Debug.Log("API Keys loaded successfully from TextAsset.");
+            }
+        }
+        else
+        {
+            Debug.LogError("API Config File is missing! Please assign your secrets.json file to the Api Config File slot in the Inspector.");
+        }
+    }
 
     public void OnSendClick()
     {
