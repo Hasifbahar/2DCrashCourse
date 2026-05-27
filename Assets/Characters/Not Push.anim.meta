@@ -1,8 +1,12 @@
 fileFormatVersion: 2
+<<<<<<<< Updated upstream:Assets/Characters/Not Push.anim.meta
 guid: ac6debd9132b0154798a1cd2ff61c7e6
+========
+guid: a0b52eaa5a8ab414891f60eddf590e9d
+>>>>>>>> Stashed changes:Assets/Characters/FightIdle.anim.meta
 NativeFormatImporter:
   externalObjects: {}
-  mainObjectFileID: 7400000
+  mainObjectFileID: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 
