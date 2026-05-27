@@ -9,6 +9,8 @@ public class FightPuzzleManager : MonoBehaviour
     [SerializeField] private GameObject winUI;
     [SerializeField] private GameObject tryUI;
     [SerializeField] private Animator workerAnimator;
+    [SerializeField] private string loseScene = "AlternateLevel1";
+    [SerializeField] private string winScene = "Level1";
 
     private void Start()
     {
@@ -59,7 +61,7 @@ IEnumerator CheckAndPlay()
                 // ADDED: Wait for a moment so the player sees the UI, 
                 // then transition to the alternate level
                 yield return new WaitForSeconds(2f); 
-                TransitionManager.Instance.LoadLevel("AlternateLevel1", 0.5f);
+                TransitionManager.Instance.LoadLevel(loseScene, 0.5f);
 
                 ResetAll();
                 SetIdle(true);
@@ -79,7 +81,7 @@ IEnumerator CheckAndPlay()
         ResetAll();
         SetIdle(true);
         yield return new WaitForSeconds(2f);
-        TransitionManager.Instance.LoadLevel("LevelScene", 0.5f);
+        TransitionManager.Instance.LoadLevel(winScene, 0.5f);
     }
 
     void PlayCorrectAnimation(int index)

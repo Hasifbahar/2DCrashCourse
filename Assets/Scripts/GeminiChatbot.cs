@@ -1,6 +1,5 @@
-using Cysharp.Threading.Tasks;
+
 using DG.Tweening;
-using PonyuDev.SherpaOnnx.Tts.Engine;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -10,48 +9,41 @@ using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 [System.Serializable] public class GeminiPart { public string text; }
+[System.Serializable] public class GeminiContent { public string role; public List<GeminiPart> parts; }
+[System.Serializable] public class GeminiSystemInstruction { public List<GeminiPart> parts; }
+[System.Serializable] public class GeminiRequest { public List<GeminiContent> contents; public GeminiSystemInstruction system_instruction; }
+[System.Serializable] public class GeminiResponse { public Candidate[] candidates; [System.Serializable] public class Candidate { public GeminiContent content; } }
+
+// ElevenLabs Data Structures
 [System.Serializable]
-public class GeminiContent
+public class ElevenLabsRequest
 {
-    public string role;
-    public List<GeminiPart> parts;
-}
-[System.Serializable]
-public class GeminiSystemInstruction
-{
-    public List<GeminiPart> parts;
-}
-[System.Serializable]
-public class GeminiRequest
-{
-    public List<GeminiContent> contents;
-    public GeminiSystemInstruction system_instruction;
-}
-[System.Serializable]
-public class GeminiResponse
-{
-    public Candidate[] candidates;
+    public string text;
+    public string model_id = "eleven_flash_v2_5"; // Low latency, high performance model
+    public VoiceSettings voice_settings;
 
     [System.Serializable]
-    public class Candidate
+    public class VoiceSettings
     {
-        public GeminiContent content;
+        public float stability = 0.5f;
+        public float similarity_boost = 0.75f;
     }
 }
+
+[RequireComponent(typeof(AudioSource))]
 public class GeminiChatbot : MonoBehaviour
 {
-    [Header("API Config")]
-    [SerializeField] private string apiKey = "YOUR_API_KEY_HERE";
-
-    [Tooltip("Select the model version to use for requests")]
+    [Header("API Config (Gemini)")]
+    [SerializeField] private string apiKey = "YOUR_GEMINI_API_KEY";
     [SerializeField] private GeminiModel selectedModel = GeminiModel.Gemini_3_1_Flash_Lite;
-    public enum GeminiModel
-    {
-        Gemini_3_1_Flash_Lite,
-        Gemini_3_Flash,
-        Gemini_2_5_Flash,
-        Gemini_2_5_Flash_Lite
-    }
+
+    public enum GeminiModel { Gemini_3_1_Flash_Lite, Gemini_3_Flash, Gemini_2_5_Flash, Gemini_2_5_Flash_Lite }
+
+    [Header("API Config (ElevenLabs)")]
+    [SerializeField] private string elevenLabsApiKey = "YOUR_ELEVENLABS_API_KEY";
+    [Tooltip("The ID of the voice you want to use (e.g., pMsXg91Y998u4A3m9P6C)")]
+    [SerializeField] private string voiceId = "21m00Tcm4TNLbtqAWWHP"; // Default Rachel Voice
+
     [Header("UI")]
     public TMP_InputField inputField;
     public TMP_Text chatDisplay;
@@ -59,19 +51,14 @@ public class GeminiChatbot : MonoBehaviour
     public Button sendButton;
 
     [Header("Settings")]
-    [TextArea(3, 5)]
-    public string systemPrompt = "You are a helpful assistant in a Unity game. Be concise.";
-    [TextArea(3, 5)]
-    public string startSpeech = "Hello! I'm Gemini, your in-game assistant. How can I help you today?";
+    [TextArea(3, 5)] public string systemPrompt = "You are a helpful assistant in a Unity game. Be concise.";
+    [TextArea(3, 5)] public string startSpeech = "Hello! I'm Gemini, your in-game assistant. How can I help you today?";
     public float typeSpeed = 0.02f;
     public int maxHistory = 3;
 
-    [Header("Animation")]
-    [SerializeField] private Animator npcAnimator;
-
     private List<GeminiContent> chatHistory = new List<GeminiContent>();
     private Coroutine chatRoutine;
-    private SherpaTTSManager _ttsManager;
+    private AudioSource audioSource;
 
     [Header("DOTWEEN")]
     private Tween thinkingTween;
@@ -79,38 +66,30 @@ public class GeminiChatbot : MonoBehaviour
     private string thinkingBase = "\n<color=#000000><i>Gemini is thinking";
     private int thinkingStartIndex = -1;
     private float thinkingTimer = 0f;
+
     void Start()
     {
-        _ttsManager = GetComponent<SherpaTTSManager>(); // Cache it here
+        audioSource = GetComponent<AudioSource>();
         sendButton.onClick.AddListener(OnSendClick);
         chatDisplay.text = "<color=#013220><i>System: Connection ready.</i></color>\n";
         StartCoroutine(ForceScroll());
         StartCoroutine(Typewriter(startSpeech));
     }
-    private string GetModelIdentifier()
-    {
-        return selectedModel switch
-        {
-            GeminiModel.Gemini_3_1_Flash_Lite => "gemini-3.1-flash-lite-preview",
-            GeminiModel.Gemini_3_Flash => "gemini-3-flash",
-            GeminiModel.Gemini_2_5_Flash => "gemini-2.5-flash",
-            GeminiModel.Gemini_2_5_Flash_Lite => "gemini-2.5-flash-lite",
-            _ => "gemini-3.1-flash-lite-preview"
-        };
-    }
 
-    private string GetEndpoint()
+    private string GetModelIdentifier() => selectedModel switch
     {
-        return $"https://generativelanguage.googleapis.com/v1beta/models/{GetModelIdentifier()}:generateContent?key={apiKey}";
-    }
-    void Update()
-    {
-        // Enter = Send | Shift+Enter = New line
-        if (Input.GetKeyDown(KeyCode.Return) && inputField.isFocused && !Input.GetKey(KeyCode.LeftShift))
-        {
-            OnSendClick();
-        }
-    }
+        GeminiModel.Gemini_3_1_Flash_Lite => "gemini-3.1-flash-lite-preview",
+        GeminiModel.Gemini_3_Flash => "gemini-3-flash",
+        GeminiModel.Gemini_2_5_Flash => "gemini-2.5-flash",
+        GeminiModel.Gemini_2_5_Flash_Lite => "gemini-2.5-flash-lite",
+        _ => "gemini-3.1-flash-lite-preview"
+    };
+
+    private string GetGeminiEndpoint() => $"https://generativelanguage.googleapis.com/v1beta/models/{GetModelIdentifier()}:generateContent?key={apiKey}";
+    private string GetElevenLabsEndpoint() => $"https://api.elevenlabs.io/v1/text-to-speech/{voiceId}";
+
+
+
     public void OnSendClick()
     {
         if (string.IsNullOrWhiteSpace(inputField.text))
@@ -122,9 +101,7 @@ public class GeminiChatbot : MonoBehaviour
         string message = inputField.text.Trim();
         inputField.text = "";
 
-        if (chatRoutine != null)
-            StopCoroutine(chatRoutine);
-
+        if (chatRoutine != null) StopCoroutine(chatRoutine);
         chatRoutine = StartCoroutine(ChatFlow(message));
     }
 
@@ -135,40 +112,31 @@ public class GeminiChatbot : MonoBehaviour
         StartThinkingAnimation();
         ScrollToBottom();
         AddToHistory("user", message);
+
         GeminiRequest requestData = new GeminiRequest
         {
             contents = chatHistory,
-            system_instruction = new GeminiSystemInstruction
-            {
-                parts = new List<GeminiPart> { new GeminiPart { text = systemPrompt } }
-            }
+            system_instruction = new GeminiSystemInstruction { parts = new List<GeminiPart> { new GeminiPart { text = systemPrompt } } }
         };
 
         string json = JsonUtility.ToJson(requestData);
-        string url = GetEndpoint();
-
-        using (UnityWebRequest req = new UnityWebRequest(url, "POST"))
+        using (UnityWebRequest req = new UnityWebRequest(GetGeminiEndpoint(), "POST"))
         {
             req.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(json));
             req.downloadHandler = new DownloadHandlerBuffer();
             req.SetRequestHeader("Content-Type", "application/json");
 
             yield return req.SendWebRequest();
-
-            // Remove thinking text
             StopThinkingAnimation();
 
             if (req.result != UnityWebRequest.Result.Success)
             {
                 AppendMessage("System", $"Error: {req.error}", Color.red);
-                Debug.LogError(req.downloadHandler.text);
                 sendButton.interactable = true;
                 yield break;
             }
 
-            // Parse response
             string reply = ParseResponse(req.downloadHandler.text);
-
             if (string.IsNullOrEmpty(reply))
             {
                 AppendMessage("System", "Empty AI response.", Color.yellow);
@@ -178,90 +146,96 @@ public class GeminiChatbot : MonoBehaviour
 
             AddToHistory("model", reply);
 
+            // Kick off text typewriter and voice synthesis concurrently
+            StartCoroutine(FetchAndPlayElevenLabs(reply));
             yield return Typewriter(reply);
         }
-
         sendButton.interactable = true;
     }
-    private void StartThinkingAnimation()
+
+    private IEnumerator FetchAndPlayElevenLabs(string textToSpeak)
     {
-        thinkingTimer = 0f;
+        // Strip out markdown symbols before sending text to speech engine
+        string cleanText = textToSpeak.Replace("*", "").Replace("#", "").Replace("_", "").Trim();
 
-        string initialText = thinkingBase + ".</i></color>";
-
-        thinkingStartIndex = chatDisplay.text.Length;
-        chatDisplay.text += initialText;
-
-        ScrollToBottom();
-
-        thinkingTween = DOTween.To(() => thinkingTimer, x => thinkingTimer = x, 1f, 1f)
-            .SetEase(Ease.Linear)
-            .SetLoops(-1, LoopType.Restart)
-            .OnUpdate(() =>
-            {
-                if (thinkingStartIndex < 0) return;
-
-                
-                int dotsCount = Mathf.FloorToInt(thinkingTimer * (maxDots + 1));
-                string dots = new string('.', dotsCount);
-
-                string newText = $"{thinkingBase}{dots}</i></color>";
-
-                chatDisplay.text =
-                    chatDisplay.text.Substring(0, thinkingStartIndex) + newText;
-
-                ScrollToBottom();
-            });
-
-    }
-    private void StopThinkingAnimation()
-    {
-        if (thinkingTween != null && thinkingTween.IsActive())
-            thinkingTween.Kill();
-
-        chatDisplay.DOKill();
-
-        // Remove ONLY the last thinking text
-        if (thinkingStartIndex >= 0 && thinkingStartIndex < chatDisplay.text.Length)
+        ElevenLabsRequest ttsRequest = new ElevenLabsRequest
         {
-            chatDisplay.text = chatDisplay.text.Substring(0, thinkingStartIndex);
-        }
+            text = cleanText,
+            voice_settings = new ElevenLabsRequest.VoiceSettings { stability = 0.5f, similarity_boost = 0.75f }
+        };
 
-        thinkingStartIndex = -1;
+        string jsonPayload = JsonUtility.ToJson(ttsRequest);
+
+        // Requesting MPEG format because UnityWebRequestMultimedia handles basic encoding best depending on platform
+        using (UnityWebRequest ttsReq = new UnityWebRequest(GetElevenLabsEndpoint() + "?output_format=mp3_44100_128", "POST"))
+        {
+            ttsReq.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonPayload));
+            ttsReq.downloadHandler = new DownloadHandlerAudioClip(GetElevenLabsEndpoint(), AudioType.MPEG);
+
+            ttsReq.SetRequestHeader("Content-Type", "application/json");
+            ttsReq.SetRequestHeader("xi-api-key", elevenLabsApiKey);
+            ttsReq.SetRequestHeader("accept", "audio/mpeg");
+
+            yield return ttsReq.SendWebRequest();
+
+            if (ttsReq.result == UnityWebRequest.Result.Success)
+            {
+                AudioClip clip = DownloadHandlerAudioClip.GetContent(ttsReq);
+                if (clip != null)
+                {
+                    audioSource.clip = clip;
+                    audioSource.Play();
+                }
+            }
+            else
+            {
+                Debug.LogError($"ElevenLabs Error: {ttsReq.error} | {ttsReq.downloadHandler.text}");
+            }
+        }
     }
+
     private IEnumerator Typewriter(string text)
     {
         string header = "\n<color=#00008B><b>Gemini:</b></color> ";
         StopThinkingAnimation();
         chatDisplay.text += header;
 
-        string cleanText = text.Replace("*", "").Replace("#", "").Replace("_", "").Trim();
-
-        float dynamicTypeSpeed = typeSpeed; // fallback
-
-        if (_ttsManager != null)
-        {
-            TtsResult result = null;
-
-            // wait for TTS result (generation done + playback started)
-            yield return UniTask.ToCoroutine(async () =>
-            {
-                result = await _ttsManager.SpeakAsync(cleanText);
-            });
-            if (result != null && result.DurationSeconds > 0f)
-            {
-                dynamicTypeSpeed = result.DurationSeconds / Mathf.Max(text.Length, 1);
-            }
-        }
-        npcAnimator.SetBool("isTalking", true);
-        // Type with synced speed
         for (int i = 0; i < text.Length; i++)
         {
             chatDisplay.text += text[i];
             ScrollToBottom();
-            yield return new WaitForSeconds(dynamicTypeSpeed);
+            yield return new WaitForSeconds(typeSpeed);
         }
-        npcAnimator.SetBool("isTalking", false);
+    }
+
+    // --- Core UI & Animation Helpers ---
+    private void StartThinkingAnimation()
+    {
+        thinkingTimer = 0f;
+        string initialText = thinkingBase + ".</i></color>";
+        thinkingStartIndex = chatDisplay.text.Length;
+        chatDisplay.text += initialText;
+        ScrollToBottom();
+
+        thinkingTween = DOTween.To(() => thinkingTimer, x => thinkingTimer = x, 1f, 1f)
+            .SetEase(Ease.Linear).SetLoops(-1, LoopType.Restart)
+            .OnUpdate(() =>
+            {
+                if (thinkingStartIndex < 0) return;
+                int dotsCount = Mathf.FloorToInt(thinkingTimer * (maxDots + 1));
+                string dots = new string('.', dotsCount);
+                chatDisplay.text = chatDisplay.text.Substring(0, thinkingStartIndex) + $"{thinkingBase}{dots}</i></color>";
+                ScrollToBottom();
+            });
+    }
+
+    private void StopThinkingAnimation()
+    {
+        if (thinkingTween != null && thinkingTween.IsActive()) thinkingTween.Kill();
+        chatDisplay.DOKill();
+        if (thinkingStartIndex >= 0 && thinkingStartIndex < chatDisplay.text.Length)
+            chatDisplay.text = chatDisplay.text.Substring(0, thinkingStartIndex);
+        thinkingStartIndex = -1;
     }
 
     private void AppendMessage(string sender, string msg, Color color)
@@ -273,17 +247,8 @@ public class GeminiChatbot : MonoBehaviour
 
     private void AddToHistory(string role, string text)
     {
-        chatHistory.Add(new GeminiContent
-        {
-            role = role,
-            parts = new List<GeminiPart> { new GeminiPart { text = text } }
-        });
-
-        // Trim history safely
-        while (chatHistory.Count > maxHistory)
-        {
-            chatHistory.RemoveAt(0);
-        }
+        chatHistory.Add(new GeminiContent { role = role, parts = new List<GeminiPart> { new GeminiPart { text = text } } });
+        while (chatHistory.Count > maxHistory) chatHistory.RemoveAt(0);
     }
 
     private string ParseResponse(string json)
@@ -291,32 +256,13 @@ public class GeminiChatbot : MonoBehaviour
         try
         {
             GeminiResponse res = JsonUtility.FromJson<GeminiResponse>(json);
-
-            if (res?.candidates != null &&
-                res.candidates.Length > 0 &&
-                res.candidates[0].content?.parts != null &&
-                res.candidates[0].content.parts.Count > 0)
-            {
+            if (res?.candidates?.Length > 0 && res.candidates[0].content?.parts?.Count > 0)
                 return res.candidates[0].content.parts[0].text;
-            }
         }
-        catch
-        {
-            Debug.LogWarning("Failed to parse response.");
-        }
-
+        catch { Debug.LogWarning("Failed to parse response."); }
         return null;
     }
 
-    private void ScrollToBottom()
-    {
-        Canvas.ForceUpdateCanvases();
-        scrollRect.DONormalizedPos(new Vector2(0, 0), 0.25f);
-    }
-
-    private IEnumerator ForceScroll()
-    {
-        yield return null;
-        scrollRect.verticalNormalizedPosition = 0f;
-    }
+    private void ScrollToBottom() { Canvas.ForceUpdateCanvases(); scrollRect.DONormalizedPos(new Vector2(0, 0), 0.25f); }
+    private IEnumerator ForceScroll() { yield return null; scrollRect.verticalNormalizedPosition = 0f; }
 }

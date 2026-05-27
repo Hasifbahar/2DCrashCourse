@@ -1091,7 +1091,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1425590872}
   - component: {fileID: 1425590874}
-  - component: {fileID: 1425590873}
   - component: {fileID: 1425590869}
   m_Layer: 0
   m_Name: GeminiChatbot
@@ -1211,23 +1210,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1425590873
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1425590868}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2962b2d627eea6b49af2b84cc7bc7386, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _audioSource: {fileID: 1425590869}
-  speed: 1
-  speakerId: 0
-  silenceScale: 0.2
-  numSteps: 5
 --- !u!114 &1425590874
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1240,8 +1222,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bdd8a8aec6847224ca55524d8d113032, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  apiKey: 
-  selectedModel: 0
+  apiKey: AIzaSyDMynoSenXC3uxUJtBp_6EDQ5CCG0i7f6s
+  selectedModel: 2
+  elevenLabsApiKey: sk_d9acd9fa8452abeb4c29672284d9458aba2719313fbe112a
+  voiceId: hpp4J3VqNfWAUOO0d1Us
   inputField: {fileID: 216014989}
   chatDisplay: {fileID: 1216428645}
   scrollRect: {fileID: 356682880}
@@ -1252,7 +1236,6 @@ MonoBehaviour:
   startSpeech: Greetings, traveler! My name is Smith.
   typeSpeed: 0.03
   maxHistory: 10
-  npcAnimator: {fileID: 1472891287}
 --- !u!1 &1443149907
 GameObject:
   m_ObjectHideFlags: 0
@@ -1897,7 +1880,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1425590873}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ManualTtsExample, Assembly-CSharp
         m_MethodName: Speak
         m_Mode: 1
