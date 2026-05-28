@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 [System.Serializable] public class GeminiPart { public string text; }
@@ -13,12 +12,11 @@ using UnityEngine.UI;
 [System.Serializable] public class GeminiRequest { public List<GeminiContent> contents; public GeminiSystemInstruction system_instruction; }
 [System.Serializable] public class GeminiResponse { public Candidate[] candidates; [System.Serializable] public class Candidate { public GeminiContent content; } }
 
-// ElevenLabs Data Structures
 [System.Serializable]
 public class ElevenLabsRequest
 {
     public string text;
-    public string model_id = "eleven_flash_v2_5"; // Low latency, high performance model
+    public string model_id = "eleven_flash_v2_5";
     public VoiceSettings voice_settings;
 
     [System.Serializable]
@@ -35,14 +33,17 @@ public class GeminiChatbot : MonoBehaviour
     [Header("Config Settings")]
     [Tooltip("Drag and drop your secrets.json file here.")]
     [SerializeField] private TextAsset apiConfigFile;
-    
-    // Data class used to deserialize the JSON
+
     [System.Serializable]
     private class ApiSecrets
     {
         public string geminiApiKey;
         public string elevenLabsApiKey;
     }
+
+    [Header("Feature Toggles")]
+    [Tooltip("Check this to enable ElevenLabs Voice generation. Uncheck to run text-only.")]
+    [SerializeField] private bool useElevenLabsTTS = true;
 
     [Header("API Config (Gemini)")]
     private string geminiApiKey;
@@ -52,8 +53,8 @@ public class GeminiChatbot : MonoBehaviour
 
     [Header("API Config (ElevenLabs)")]
     private string elevenLabsApiKey;
-    [Tooltip("The ID of the voice you want to use (e.g., pMsXg91Y998u4A3m9P6C)")]
-    [SerializeField] private string voiceId = "21m00Tcm4TNLbtqAWWHP"; // Default Rachel Voice
+    [Tooltip("The ID of the voice you want to use")]
+    [SerializeField] private string voiceId = "21m00Tcm4TNLbtqAWWHP";
 
     [Header("UI")]
     public TMP_InputField inputField;
@@ -89,7 +90,7 @@ public class GeminiChatbot : MonoBehaviour
         sendButton.onClick.AddListener(OnSendClick);
         chatDisplay.text = "<color=#013220><i>System: Connection ready.</i></color>\n";
         StartCoroutine(ForceScroll());
-        StartCoroutine(Typewriter(startSpeech));
+        StartCoroutine(DisplayAndSpeakGreeting());
     }
 
     private string GetModelIdentifier() => selectedModel switch
@@ -109,21 +110,18 @@ public class GeminiChatbot : MonoBehaviour
         if (apiConfigFile != null)
         {
             string jsonContent = apiConfigFile.text;
-            
-            // Parse the JSON into our C# object
             ApiSecrets secrets = JsonUtility.FromJson<ApiSecrets>(jsonContent);
 
             if (secrets != null)
             {
                 geminiApiKey = secrets.geminiApiKey;
                 elevenLabsApiKey = secrets.elevenLabsApiKey;
-                
                 Debug.Log("API Keys loaded successfully from TextAsset.");
             }
         }
         else
         {
-            Debug.LogError("API Config File is missing! Please assign your secrets.json file to the Api Config File slot in the Inspector.");
+            Debug.LogError("API Config File is missing! Please assign your secrets.json file.");
         }
     }
 
@@ -140,6 +138,21 @@ public class GeminiChatbot : MonoBehaviour
 
         if (chatRoutine != null) StopCoroutine(chatRoutine);
         chatRoutine = StartCoroutine(ChatFlow(message));
+    }
+
+    private IEnumerator DisplayAndSpeakGreeting()
+    {
+        sendButton.interactable = false;
+        AudioClip greetingClip = null;
+
+        // Check if TTS feature toggle is true
+        if (useElevenLabsTTS)
+        {
+            yield return FetchElevenLabsAudio(startSpeech, clip => greetingClip = clip);
+        }
+
+        yield return Typewriter(startSpeech, greetingClip);
+        sendButton.interactable = true;
     }
 
     private IEnumerator ChatFlow(string message)
@@ -183,16 +196,26 @@ public class GeminiChatbot : MonoBehaviour
 
             AddToHistory("model", reply);
 
-            // Kick off text typewriter and voice synthesis concurrently
-            StartCoroutine(FetchAndPlayElevenLabs(reply));
-            yield return Typewriter(reply);
+            AudioClip downloadedVoiceClip = null;
+
+            // Check if TTS feature toggle is true before pulling data from network
+            if (useElevenLabsTTS)
+            {
+                yield return FetchElevenLabsAudio(reply, clip => downloadedVoiceClip = clip);
+            }
+            else
+            {
+                // Ensure audio completely cuts off if feature is deactivated dynamically mid-sentence
+                if (audioSource.isPlaying) audioSource.Stop();
+            }
+
+            yield return Typewriter(reply, downloadedVoiceClip);
         }
         sendButton.interactable = true;
     }
 
-    private IEnumerator FetchAndPlayElevenLabs(string textToSpeak)
+    private IEnumerator FetchElevenLabsAudio(string textToSpeak, System.Action<AudioClip> onAudioReady)
     {
-        // Strip out markdown symbols before sending text to speech engine
         string cleanText = textToSpeak.Replace("*", "").Replace("#", "").Replace("_", "").Trim();
 
         ElevenLabsRequest ttsRequest = new ElevenLabsRequest
@@ -203,7 +226,6 @@ public class GeminiChatbot : MonoBehaviour
 
         string jsonPayload = JsonUtility.ToJson(ttsRequest);
 
-        // Requesting MPEG format because UnityWebRequestMultimedia handles basic encoding best depending on platform
         using (UnityWebRequest ttsReq = new UnityWebRequest(GetElevenLabsEndpoint() + "?output_format=mp3_44100_128", "POST"))
         {
             ttsReq.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonPayload));
@@ -218,30 +240,37 @@ public class GeminiChatbot : MonoBehaviour
             if (ttsReq.result == UnityWebRequest.Result.Success)
             {
                 AudioClip clip = DownloadHandlerAudioClip.GetContent(ttsReq);
-                if (clip != null)
-                {
-                    audioSource.clip = clip;
-                    audioSource.Play();
-                }
+                if (clip != null) onAudioReady?.Invoke(clip);
             }
             else
             {
-                Debug.LogError($"ElevenLabs Error: {ttsReq.error} | {ttsReq.downloadHandler.text}");
+                Debug.LogError($"ElevenLabs Error: {ttsReq.error}");
+                onAudioReady?.Invoke(null);
             }
         }
     }
 
-    private IEnumerator Typewriter(string text)
+    private IEnumerator Typewriter(string text, AudioClip voiceClip)
     {
         string header = "\n<color=#00008B><b>Gemini:</b></color> ";
         StopThinkingAnimation();
         chatDisplay.text += header;
 
+        float calculatedTypeSpeed = typeSpeed;
+
+        // Dynamic evaluation path handles missing clip gracefully
+        if (useElevenLabsTTS && voiceClip != null)
+        {
+            calculatedTypeSpeed = voiceClip.length / Mathf.Max(text.Length, 1);
+            audioSource.clip = voiceClip;
+            audioSource.Play();
+        }
+
         for (int i = 0; i < text.Length; i++)
         {
             chatDisplay.text += text[i];
             ScrollToBottom();
-            yield return new WaitForSeconds(typeSpeed);
+            yield return new WaitForSeconds(calculatedTypeSpeed);
         }
     }
 
