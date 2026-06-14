@@ -6,25 +6,20 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     public float moveSpeed = 1f;
-
     public float collisionOffset = 0.05f;
-
     public ContactFilter2D movementFilter;
-
     public SwordAttack swordAttack;
-
     public bool interact;
 
+    // --- NEW FOOTSTEP VARIABLES ---
+    private bool playingFootsteps = false;
+    public float footstepSpeed = 0.5f;
+
     Vector2 movementInput;
-
     SpriteRenderer spriteRenderer;
-
     Rigidbody2D rb;
-
     Animator animator;
-
     List<RaycastHit2D> castCollisions = new List<RaycastHit2D>();
-
 
     bool canMove = true;
 
@@ -50,15 +45,33 @@ public class PlayerController : MonoBehaviour
 
                  if(!success  && movementInput.y > 0) {
                         success = TryMove(new Vector2(0, movementInput.y));
-                    }
+                 }
             
-
+                // YOUR ORIGINAL ANIMATION LOGIC (RESTORED)
                 animator.SetBool("isMoving", success);
+
+                // --- NEW FOOTSTEP LOGIC ---
+                if (success && !playingFootsteps)
+                {
+                    StartFootsteps();
+                }
+                else if (!success && playingFootsteps)
+                {
+                    StopFootsteps();
+                }
+
             } else {
+                // YOUR ORIGINAL ANIMATION LOGIC (RESTORED)
                 animator.SetBool("isMoving", false);
+
+                // --- NEW FOOTSTEP LOGIC ---
+                if(playingFootsteps)
+                {
+                    StopFootsteps();
+                }
             }
 
-            // Set direction of sprite to movement direction
+            // Set direction of sprite to movement direction (RESTORED)
             if(movementInput.x < 0) {
                 spriteRenderer.flipX = true;
             } else if (movementInput.x > 0) {
@@ -123,5 +136,24 @@ public class PlayerController : MonoBehaviour
 
     public void UnlockMovement() {
         canMove = true;
+    }
+
+    // --- NEW FOOTSTEP METHODS CAREFULLY ADDED AT THE BOTTOM ---
+    void StartFootsteps()
+    {
+        playingFootsteps = true;
+        InvokeRepeating(nameof(PlayFootstep), 0f, footstepSpeed);
+    }
+
+    void StopFootsteps()
+    {
+        playingFootsteps = false;
+        CancelInvoke(nameof(PlayFootstep));
+    }
+
+    void PlayFootstep()
+    {
+        // Make sure your SoundEffectManager has a group perfectly named "Footstep"
+        SoundEffectManager.Play("Footstep"); 
     }
 }

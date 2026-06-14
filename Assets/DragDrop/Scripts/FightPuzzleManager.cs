@@ -23,7 +23,7 @@ public class FightPuzzleManager : MonoBehaviour
     {
         StartCoroutine(CheckAndPlay());
     }
-IEnumerator CheckAndPlay()
+    IEnumerator CheckAndPlay()
     {
         winUI.SetActive(false);
         tryUI.SetActive(false);
@@ -54,6 +54,17 @@ IEnumerator CheckAndPlay()
 
                 workerAnimator.SetBool("dead", true);
                 yield return new WaitForSeconds(2f);
+
+                GameUI ui = FindObjectOfType<GameUI>();
+                if(ui != null) 
+                {
+                    ui.SubtractScore(1);
+                    Debug.Log("SUCCESS: Wrong answer! 1 Point lost.");
+                }
+                else
+                {
+                    Debug.LogError("ERROR: The Puzzle Manager could not find the GameUI script anywhere in this scene!");
+                }
 
                 // Show the UI
                 tryUI.SetActive(true);

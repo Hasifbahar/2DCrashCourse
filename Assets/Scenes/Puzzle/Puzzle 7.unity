@@ -640,7 +640,6 @@ GameObject:
   - component: {fileID: 341052297}
   - component: {fileID: 341052300}
   - component: {fileID: 341052299}
-  - component: {fileID: 341052298}
   m_Layer: 0
   m_Name: WorkerImage (2)
   m_TagString: Untagged
@@ -667,27 +666,6 @@ RectTransform:
   m_AnchoredPosition: {x: 400, y: -2}
   m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!95 &341052298
-Animator:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 341052296}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 796a3ff5751dbbd4faec641ad5700063, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &341052299
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1122,7 +1100,6 @@ GameObject:
   - component: {fileID: 438504295}
   - component: {fileID: 438504298}
   - component: {fileID: 438504297}
-  - component: {fileID: 438504296}
   m_Layer: 0
   m_Name: WorkerImage (1)
   m_TagString: Untagged
@@ -1149,27 +1126,6 @@ RectTransform:
   m_AnchoredPosition: {x: 199, y: 0}
   m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!95 &438504296
-Animator:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 438504294}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 796a3ff5751dbbd4faec641ad5700063, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &438504297
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2530,7 +2486,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1473658181}
   m_Enabled: 1
   m_EditorHideFlags: 0
+<<<<<<< HEAD
   m_Script: {fileID: 11500000, guid: 167cfa04a2e937b4aa6a68a25e7c092a, type: 3}
+=======
+  m_Script: {fileID: 11500000, guid: 47e13231ba9167545955ab4cc84b2c80, type: 3}
+>>>>>>> 6263eb87f0407f648ba540fb6ac797ddc5230c94
   m_Name: 
   m_EditorClassIdentifier: 
   slots:
@@ -2539,7 +2499,11 @@ MonoBehaviour:
   - {fileID: 1504378475}
   winUI: {fileID: 50846445}
   tryUI: {fileID: 503217602}
+<<<<<<< HEAD
   mainAnimator: {fileID: 1945979227}
+=======
+  workerAnimator: {fileID: 1945979227}
+>>>>>>> 6263eb87f0407f648ba540fb6ac797ddc5230c94
 --- !u!1 &1476642566
 GameObject:
   m_ObjectHideFlags: 0
@@ -3284,7 +3248,11 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1473658185}
+<<<<<<< HEAD
         m_TargetAssemblyTypeName: SniperPuzzleManager, Assembly-CSharp
+=======
+        m_TargetAssemblyTypeName: ShootPuzzleManager, Assembly-CSharp
+>>>>>>> 6263eb87f0407f648ba540fb6ac797ddc5230c94
         m_MethodName: CheckAnswer
         m_Mode: 1
         m_Arguments:

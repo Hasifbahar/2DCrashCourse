@@ -1222,8 +1222,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bdd8a8aec6847224ca55524d8d113032, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  apiConfigFile: {fileID: 4900000, guid: f0678ae81c4a3ad4a83109d80906ec11, type: 3}
-  selectedModel: 2
+  apiConfigFile: {fileID: 4900000, guid: 886fa200685ade34e86ef98635fbfbaf, type: 3}
+  useElevenLabsTTS: 1
+  selectedModel: 0
   voiceId: hpp4J3VqNfWAUOO0d1Us
   inputField: {fileID: 216014989}
   chatDisplay: {fileID: 1216428645}
@@ -1270,8 +1271,8 @@ Camera:
   m_GameObject: {fileID: 1443149907}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 1}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0.6606889, g: 0.78802305, b: 0.9528302, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0

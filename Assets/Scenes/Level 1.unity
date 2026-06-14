@@ -5639,7 +5639,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   soundEffectGroups:
-  - name: Footsteps
+  - name: Footstep
     audioClips:
     - {fileID: 8300000, guid: 8d6b04a62180fca4f9136562289e80a0, type: 3}
     - {fileID: 8300000, guid: fb8d45e3f1ea3e84e878a507d738e78d, type: 3}
