@@ -64,6 +64,10 @@ sysinfo.txt
 *.unitypackage.meta
 *.app
 
+# Ignore Local API Keys
+Assets/secrets.json
+Assets/secrets.json.meta
+
 # Crashlytics generated file
 crashlytics-build.properties
 

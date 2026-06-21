@@ -1983,6 +1983,8 @@ MonoBehaviour:
   winUI: {fileID: 50846445}
   tryUI: {fileID: 503217602}
   workerAnimator: {fileID: 62798297}
+  loseScene: AlternateLevel1
+  winScene: LevelScene
 --- !u!4 &1473658183
 Transform:
   m_ObjectHideFlags: 0
