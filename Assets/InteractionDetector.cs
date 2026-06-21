@@ -14,9 +14,7 @@ public class InteractionDetector : MonoBehaviour
         interactionIcon.SetActive(false);
     }
 
-    public void OnInteract(InputValue value)
-    {
-        if (value.isPressed)
+    public void TriggerInteraction()
         {
             if (interactableInRange != null)
             {
@@ -26,9 +24,7 @@ public class InteractionDetector : MonoBehaviour
             {
                 Debug.Log("Button pressed, but nothing in range!");
             }
-            
         }
-    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {

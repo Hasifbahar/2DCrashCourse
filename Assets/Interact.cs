@@ -40,6 +40,8 @@ public class Interact : MonoBehaviour
     {
         Debug.Log("Entering " + roomName);
 
+        PlayerPrefs.SetString("LastLevel", UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+
         TransitionManager.Instance.LoadLevel(roomName); // Load the scene with the same name as the room
         interactUI.SetActive(false);
     }

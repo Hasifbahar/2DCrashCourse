@@ -109,12 +109,30 @@ public class PlayerController : MonoBehaviour
     void OnFire() {
         animator.SetTrigger("swordAttack");
     }
-    void OnInteract()
+    void OnInteract(InputValue value)
     {
-        interact = true;
-    }
+     if (value.isPressed)
+            {
+                interact = true;
+            
+                Invoke("ResetInteract", 0.1f);
+
+                 // 2. THE FIX: Bypass the Unity bug and manually trigger the NPC dialogue!
+                InteractionDetector detector = GetComponent<InteractionDetector>();
+                if (detector != null)
+                {
+                    detector.TriggerInteraction();
+                }
+            }
+        }
+    void ResetInteract()
+        {
+            interact = false;
+        }
     public void SwordAttack() {
         LockMovement();
+
+        SoundEffectManager.Play("SwordSlash");
 
         if(spriteRenderer.flipX == true){
             swordAttack.AttackLeft();

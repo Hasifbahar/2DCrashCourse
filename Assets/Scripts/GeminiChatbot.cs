@@ -331,4 +331,14 @@ public class GeminiChatbot : MonoBehaviour
 
     private void ScrollToBottom() { Canvas.ForceUpdateCanvases(); scrollRect.DONormalizedPos(new Vector2(0, 0), 0.25f); }
     private IEnumerator ForceScroll() { yield return null; scrollRect.verticalNormalizedPosition = 0f; }
+
+    // --- NEW: BACK BUTTON METHOD ---
+    public void ReturnToPreviousLevel()
+    {
+        // 1. Read the memory to see where we came from
+        string levelToLoad = PlayerPrefs.GetString("LastLevel", "Level 1");
+
+        // 2. Use your custom TransitionManager for a smooth exit!
+        MaskTransitions.TransitionManager.Instance.LoadLevel(levelToLoad);
+    }
 }

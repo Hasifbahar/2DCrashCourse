@@ -32,15 +32,22 @@ namespace MaskTransitions
         private void Awake()
         {
             if (Instance == null)
+            {
                 Instance = this;
+                transform.SetParent(null);
+                DontDestroyOnLoad(gameObject); // ONLY protect the original!
+            }
             else
-                Destroy(gameObject);
+            {
+                gameObject.SetActive(false);
 
-            DontDestroyOnLoad(gameObject);
+                Destroy(gameObject); // Destroy the duplicate completely!
+            }
         }
 
         private void Start()
         {
+            if (Instance != this) return;
             // Assign the transition sprite and color
             parentMaskImage.sprite = transitionImage;
             cutoutMask.sprite = transitionImage;
@@ -68,7 +75,7 @@ namespace MaskTransitions
             maskRect.sizeDelta = Vector2.zero;
             parentMaskRect.sizeDelta = Vector2.zero;
 
-            maskRect.DOSizeDelta(new Vector2(maxSize, maxSize), animationTime).SetEase(Ease.InOutQuad);
+            maskRect.DOSizeDelta(new Vector2(maxSize, maxSize), animationTime).SetEase(Ease.InOutQuad).SetLink(maskRect.gameObject);
             if (rotation)
                 maskRect.DORotate(new Vector3(0, 0, 180), animationTime, RotateMode.FastBeyond360).SetEase(Ease.InOutQuad);
         }
@@ -81,7 +88,7 @@ namespace MaskTransitions
             parentMaskRect.sizeDelta = Vector2.zero;
             maskRect.rotation = Quaternion.identity;
 
-            Tween blueTweenSize = maskRect.DOSizeDelta(new Vector2(maxSize, maxSize), animationTime).SetEase(Ease.InOutQuad);
+            Tween blueTweenSize = maskRect.DOSizeDelta(new Vector2(maxSize, maxSize), animationTime).SetEase(Ease.InOutQuad).SetLink(maskRect.gameObject);
 
             Sequence animationSequence = DOTween.Sequence().Join(blueTweenSize);
 
@@ -97,13 +104,19 @@ namespace MaskTransitions
 
         void EndAnimation(float? totalTime = null)
         {
+                    // THE FAIL-SAFE: If the images were destroyed, stop the animation so Unity doesn't crash!
+            if (maskRect == null || parentMaskRect == null) 
+            {
+                Debug.LogError("The Transition Images were destroyed! Check your Main Menu Hierarchy!");
+                return; 
+            }
             float animationTime = totalTime ?? individualTransitionTime;
 
             maskRect.sizeDelta = new Vector2(maxSize, maxSize);
             parentMaskRect.sizeDelta = Vector2.zero;
             parentMaskRect.rotation = Quaternion.identity;
 
-            parentMaskRect.DOSizeDelta(new Vector2(maxSize, maxSize), animationTime).SetEase(Ease.InOutQuad);
+            parentMaskRect.DOSizeDelta(new Vector2(maxSize, maxSize), animationTime).SetEase(Ease.InOutQuad).SetLink(parentMaskRect.gameObject);
             if (rotation)
                 parentMaskRect.DORotate(new Vector3(0, 0, 180), animationTime).SetEase(Ease.InOutQuad);
         }
