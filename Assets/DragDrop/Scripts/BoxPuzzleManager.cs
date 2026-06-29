@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
+using MaskTransitions; // ADDED: We need this to talk to your TransitionManager!
 
 public class BoxPuzzleManager : MonoBehaviour
 {
@@ -12,7 +13,13 @@ public class BoxPuzzleManager : MonoBehaviour
     [SerializeField] private GameObject[] workers;
     [SerializeField] private Animator[] workerAnimator;
     [SerializeField] private RectTransform[] workerPositions;
+    
+    // ADDED: Scene name variables just like in your FightPuzzleManager!
+    [SerializeField] private string loseScene = "AlternateLevel2";
+    [SerializeField] private string winScene = "Level2";
+
     private Vector2[] startPositions;
+
     private void Start()
     {
         GetWorkerGO();
@@ -40,6 +47,7 @@ public class BoxPuzzleManager : MonoBehaviour
     {
         StartCoroutine(CheckAndPlay());
     }
+    
     IEnumerator CheckAndPlay()
     {
         winUI.SetActive(false);
@@ -52,7 +60,6 @@ public class BoxPuzzleManager : MonoBehaviour
         {
             if (slots[i].IsCorrect())
             {
-
                 // Leave idle
                 workerAnimator[i].SetBool("Idle", false);
 
@@ -73,7 +80,6 @@ public class BoxPuzzleManager : MonoBehaviour
             }
             else
             {
-
                 // Leave idle
                 workerAnimator[i].SetBool("Idle", false);
 
@@ -83,11 +89,17 @@ public class BoxPuzzleManager : MonoBehaviour
                 yield return new WaitForSeconds(1.5f);
 
                 tryUI.SetActive(true);
+                
                 // Move all workers back instantly
                 for (int j = 0; j < workers.Length; j++)
                 {
                     workerPositions[j].anchoredPosition = startPositions[j];
                 }
+                
+                // ADDED: Wait for the UI to be seen, then load the lose scene!
+                yield return new WaitForSeconds(2f);
+                TransitionManager.Instance.LoadLevel(loseScene, 0.5f);
+                
                 yield break;
             }
         }
@@ -102,10 +114,10 @@ public class BoxPuzzleManager : MonoBehaviour
         {
             workerPositions[j].anchoredPosition = startPositions[j];
         }
-        //TransitionManager.Instance.LoadLevel("LevelScene", 0.5f);
+        
+        // FIXED: The comment slashes are gone, and it now uses your winScene variable!
+        TransitionManager.Instance.LoadLevel(winScene, 0.5f);
     }
-
-
 
     void SetIdle(bool state)
     {

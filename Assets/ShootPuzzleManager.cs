@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using MaskTransitions; 
 
 public class ShootPuzzleManager : MonoBehaviour
 {
@@ -8,6 +9,9 @@ public class ShootPuzzleManager : MonoBehaviour
     [SerializeField] private GameObject winUI;
     [SerializeField] private GameObject tryUI;
     [SerializeField] private Animator workerAnimator;
+
+    [SerializeField] private string winScene = "Level4"; 
+    [SerializeField] private string loseScene = "AlternateLevel4"; 
 
     private void Start()
     {
@@ -18,26 +22,21 @@ public class ShootPuzzleManager : MonoBehaviour
         TriggerAnimation("ShootIdle");
     }
 
-    // Call this function when the player clicks the check button
     public void CheckAnswer()
     {
-        // 1. Stop any running sequences to prevent overlapping
         StopAllCoroutines();
 
-        // 2. Create a flag to track if the overall answer is correct
         bool isAllCorrect = true;
 
-        // 3. Check every slot. If ANY slot is wrong, the player hasn't won yet.
         for (int i = 0; i < slots.Length; i++)
         {
             if (!slots[i].IsCorrect())
             {
                 isAllCorrect = false;
-                break; // We found a wrong answer! No need to check the rest.
+                break; 
             }
         }
 
-        // 4. Fire the correct sequence exactly ONCE based on the final result
         if (isAllCorrect)
         {
             StartCoroutine(PlayWinSequence());
@@ -50,33 +49,35 @@ public class ShootPuzzleManager : MonoBehaviour
 
     private IEnumerator PlayWinSequence()
     {
+        // 1. Play the shooting and dodging action
         TriggerAnimation("ShootHit1");
 
-        // Wait for the duration of the Hit1 animation (e.g., 1.5 seconds)
-        yield return new WaitForSeconds(1.5f);
+        // IMPORTANT: Change '1.0f' to the exact length of your ShootHit1 clip in seconds!
+        yield return new WaitForSeconds(1.0f);
 
+        // 2. Transition into the final Win loop and show UI
         TriggerAnimation("ShootWin");
         winUI.SetActive(true);
+
+        yield return new WaitForSeconds(2.0f);
+        TransitionManager.Instance.LoadLevel(winScene, 0.5f);
     }
 
     private IEnumerator PlayLoseSequence()
     {
-        // 1. Play the Hit2 animation
+        // 1. Play the getting hit action
         TriggerAnimation("ShootHit2");
 
-        // Wait for the duration of the Hit2 animation (e.g., 1.5 seconds)
-        yield return new WaitForSeconds(1.5f);
+        // IMPORTANT: Change '1.0f' to the exact length of your ShootHit2 clip in seconds!
+        yield return new WaitForSeconds(1.0f);
 
-        // 2. Transition to the looping Lose animation and show UI
+        // 2. Transition into the final Lose loop and show UI
         TriggerAnimation("ShootLose");
         tryUI.SetActive(true);
 
-        // 3. Let it loop for exactly 3 seconds
-        yield return new WaitForSeconds(3.0f);
-
-        // 4. Clean up: Hide the try UI and loop back to ShootIdle
+        yield return new WaitForSeconds(2.0f);
         tryUI.SetActive(false);
-        TriggerAnimation("ShootIdle");
+        TransitionManager.Instance.LoadLevel(loseScene, 0.5f);
     }
 
     // Helper method to cleanly reset triggers and set the new animation

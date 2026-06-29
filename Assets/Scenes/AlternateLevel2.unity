@@ -336,11 +336,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4441727624647270469, guid: 7efbadc05e448f941a5cb50dc385c173, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.821
+      value: 0.87
       objectReference: {fileID: 0}
     - target: {fileID: 4441727624647270469, guid: 7efbadc05e448f941a5cb50dc385c173, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.123
+      value: 2.6
       objectReference: {fileID: 0}
     - target: {fileID: 4441727624647270469, guid: 7efbadc05e448f941a5cb50dc385c173, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1002,8 +1002,6 @@ MonoBehaviour:
   solidCollider: {fileID: 222518748}
   roomEnemies:
   - {fileID: 1392189424798075639}
-  - {fileID: 1886179189}
-  - {fileID: 58251303}
 --- !u!95 &222518747
 Animator:
   serializedVersion: 5
@@ -1976,11 +1974,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4441727624647270469, guid: 7efbadc05e448f941a5cb50dc385c173, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.41
+      value: 0.85
       objectReference: {fileID: 0}
     - target: {fileID: 4441727624647270469, guid: 7efbadc05e448f941a5cb50dc385c173, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.22
+      value: 4.2
       objectReference: {fileID: 0}
     - target: {fileID: 4441727624647270469, guid: 7efbadc05e448f941a5cb50dc385c173, type: 3}
       propertyPath: m_LocalPosition.z
@@ -4571,11 +4569,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4441727624647270469, guid: 7efbadc05e448f941a5cb50dc385c173, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.47
+      value: -0.72
       objectReference: {fileID: 0}
     - target: {fileID: 4441727624647270469, guid: 7efbadc05e448f941a5cb50dc385c173, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.31
+      value: 3.52
       objectReference: {fileID: 0}
     - target: {fileID: 4441727624647270469, guid: 7efbadc05e448f941a5cb50dc385c173, type: 3}
       propertyPath: m_LocalPosition.z
@@ -7255,11 +7253,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4441727624647270469, guid: 7efbadc05e448f941a5cb50dc385c173, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.434
+      value: -0.33
       objectReference: {fileID: 0}
     - target: {fileID: 4441727624647270469, guid: 7efbadc05e448f941a5cb50dc385c173, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.742
+      value: 2.22
       objectReference: {fileID: 0}
     - target: {fileID: 4441727624647270469, guid: 7efbadc05e448f941a5cb50dc385c173, type: 3}
       propertyPath: m_LocalPosition.z
@@ -12595,6 +12593,8 @@ MonoBehaviour:
   - {fileID: 2116686534}
   - {fileID: 1424801923}
   - {fileID: 630818139}
+  - {fileID: 1886179189}
+  - {fileID: 58251303}
 --- !u!95 &2004389540
 Animator:
   serializedVersion: 5
@@ -13092,11 +13092,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4441727624647270469, guid: 7efbadc05e448f941a5cb50dc385c173, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.08
+      value: 0.37
       objectReference: {fileID: 0}
     - target: {fileID: 4441727624647270469, guid: 7efbadc05e448f941a5cb50dc385c173, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.66
+      value: 3.25
       objectReference: {fileID: 0}
     - target: {fileID: 4441727624647270469, guid: 7efbadc05e448f941a5cb50dc385c173, type: 3}
       propertyPath: m_LocalPosition.z
